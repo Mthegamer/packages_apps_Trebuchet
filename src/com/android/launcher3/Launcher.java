@@ -106,6 +106,8 @@ import com.android.launcher3.PagedView.TransitionEffect;
 import com.android.launcher3.settings.SettingsActivity;
 import com.android.launcher3.settings.SettingsProvider;
 
+import com.google.android.hotword.client.HotwordServiceClient;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -351,6 +353,7 @@ public class Launcher extends Activity
 
     // Preferences
     private boolean mHideIconLabels;
+    private HotwordServiceClient mHotwordServiceClient;
 
     private Runnable mBuildLayersRunnable = new Runnable() {
         public void run() {
@@ -451,6 +454,8 @@ public class Launcher extends Activity
 
         mSavedState = savedInstanceState;
         restoreState(mSavedState);
+
+        mHotwordServiceClient = new HotwordServiceClient(this);
 
         // Update customization drawer _after_ restoring the states
         if (mAppsCustomizeContent != null) {
@@ -964,6 +969,7 @@ public class Launcher extends Activity
         mWorkspace.updateInteractionForState();
         mWorkspace.onResume();
         mAppsCustomizeContent.onResume();
+        mHotwordServiceClient.requestHotwordDetection(true);
 
         //Close out TransitionEffects Fragment
         Fragment f = getFragmentManager().findFragmentByTag(
@@ -982,6 +988,8 @@ public class Launcher extends Activity
         mPaused = true;
         mDragController.cancelDrag();
         mDragController.resetLastGestureUpTime();
+
+        mHotwordServiceClient.requestHotwordDetection(false);
 
         // We call onHide() aggressively. The custom content callbacks should be able to
         // debounce excess onHide calls.
@@ -1665,6 +1673,9 @@ public class Launcher extends Activity
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        mHotwordServiceClient.onAttachedToWindow();
+        mHotwordServiceClient.requestHotwordDetection(true);
+
         // Listen for broadcasts related to user-presence
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -1679,6 +1690,9 @@ public class Launcher extends Activity
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mVisible = false;
+
+        mHotwordServiceClient.onDetachedFromWindow();
+        mHotwordServiceClient.requestHotwordDetection(false);
 
         if (mAttached) {
             unregisterReceiver(mReceiver);
