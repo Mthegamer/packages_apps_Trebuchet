@@ -202,11 +202,6 @@ public class Launcher extends Activity
     private static final String TOOLBAR_VOICE_SEARCH_ICON_METADATA_NAME =
             "com.android.launcher.toolbar_voice_search_icon";
 
-    private static final String WALLPAPER_PICKER_PACKAGE =
-            "com.android.wallpapercropper";
-    private static final String WALLPAPER_PICKER_ACTIVITY =
-            "com.android.wallpapercropper.WallpaperPickerActivity";
-
     public static final String SHOW_WEIGHT_WATCHER = "debug.show_mem";
     public static final boolean SHOW_WEIGHT_WATCHER_DEFAULT = false;
 
@@ -1038,8 +1033,8 @@ public class Launcher extends Activity
     }
 
     protected void startThemeSettings() {
-        Intent settings = new Intent().setClassName(OverviewSettingsPanel.ANDROID_SETTINGS,
-                OverviewSettingsPanel.THEME_SETTINGS);
+        Intent settings = new Intent().setClassName("com.tmobile.themechooser",
+                "com.tmobile.themechooser.ThemeChooser");
         startActivity(settings);
 
         if (mWorkspace.isInOverviewMode()) {
@@ -2270,7 +2265,7 @@ public class Launcher extends Activity
     }
 
     protected ComponentName getWallpaperPickerComponent() {
-        return new ComponentName(WALLPAPER_PICKER_PACKAGE, WALLPAPER_PICKER_ACTIVITY);
+        return new ComponentName(getPackageName(), WallpaperPickerActivity.class.getName());
     }
 
     /**
